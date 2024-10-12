@@ -1,4 +1,4 @@
-
+# bmiapp/views.py
 import pandas as pd
 from django.shortcuts import render
 from .forms import BMIForm
