@@ -14,7 +14,9 @@
     </form>
 
     {% if bmi %}
-        <h2>Your BMI: {{ bmi }}</h2>
+        <h2>Your BMI: {{ bmi|floatformat:2 }}</h2>
+        <h3>Recommended Calorie Deficit: {{ calorie_deficit|floatformat:2 }} calories</h3>
+        <h3>Recommended Calorie Surplus: {{ calorie_surplus|floatformat:2 }} calories</h3>
     {% endif %}
 </body>
 </html>
