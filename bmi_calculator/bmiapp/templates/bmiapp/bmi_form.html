@@ -15,6 +15,9 @@
                         <h2>BMI Calculator</h2>
                     </div>
                     <div class="card-body">
+                        <div class="alert alert-info text-center mb-4">
+                            Enter your current weight, height, goal weight, estimated weeks to reach your goal, age, and exercise level. This calculator will help you determine your Body Mass Index (BMI) and provide insights on whether you need to gain or lose weight to achieve your goal weight.
+                        </div>
                         <form method="POST" action="">
                             {% csrf_token %}
                             <div class="mb-3">

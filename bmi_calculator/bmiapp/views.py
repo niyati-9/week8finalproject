@@ -14,9 +14,9 @@ def get_bmi_status(bmi):
     else:
         return "Obesity"
 
-def calculate_calories_to_burn(current_weight, goal_weight, weeks):
-    weight_loss = current_weight - goal_weight
-    calories_needed = weight_loss * 7700  # 7700 calories per kg
+def calculate_weekly_calories(current_weight, goal_weight, weeks):
+    weight_change = abs(current_weight - goal_weight)
+    calories_needed = weight_change * 7700  # 7700 calories per kg
     weekly_calories = round(calories_needed / weeks, 2)
     return weekly_calories
 
@@ -27,15 +27,31 @@ def bmi_form(request):
             data = form.cleaned_data
             bmi = calculate_bmi(data['current_weight'], data['height'])
             bmi_status = get_bmi_status(bmi)
-            calories_to_burn = calculate_calories_to_burn(
-                data['current_weight'], data['goal_weight'], data['estimated_weeks']
+
+            current_weight = data['current_weight']
+            goal_weight = data['goal_weight']
+            estimated_weeks = data['estimated_weeks']
+
+            weekly_calories = calculate_weekly_calories(
+                current_weight, goal_weight, estimated_weeks
             )
+
+            # Determine whether user needs to gain or lose weight
+            if goal_weight > current_weight:
+                action = "gain"
+                message = f"You need to gain {goal_weight - current_weight} kg to reach your goal."
+            else:
+                action = "lose"
+                message = f"You need to lose {current_weight - goal_weight} kg to reach your goal."
+
             context = {
                 'bmi': bmi,
                 'bmi_status': bmi_status,
-                'calories_to_burn': calories_to_burn,
-                'goal_weight': data['goal_weight'],
-                'estimated_weeks': data['estimated_weeks']
+                'weekly_calories': weekly_calories,
+                'goal_weight': goal_weight,
+                'estimated_weeks': estimated_weeks,
+                'action': action,
+                'message': message,
             }
             return render(request, 'bmiapp/bmi_result.html', context)
     else:

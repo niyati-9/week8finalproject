@@ -3,32 +3,171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculation Results</title>
+    <title>BMI Calculation Results</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Include Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script> <!-- Include annotation plugin -->
+    <style>
+        body {
+            background-color: #f4f6f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .result-container {
+            background-color: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 50px auto;
+        }
+
+        h2 {
+            color: #0c1219;
+            font-size: 2.6rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .bmi-result {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .bmi-value {
+            font-size: 2.5em;
+            color: #000e07;
+            font-weight: 700;
+        }
+
+        .bmi-status {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: black;
+            margin-top: 10px;
+        }
+
+        .bmi-message {
+            font-size: 1.2em;
+            color: #6c757d;
+            margin-top: 20px;
+        }
+
+        .calorie-message {
+            margin-top: 20px;
+            font-size: 1.1em;
+            color: black;
+            font-weight: bold;
+        }
+
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #adb5bd;
+        }
+
+        footer a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Chart styling */
+        #bmiChart {
+            margin-top: 30px;
+            width: 100%;
+            height: 300px;
+        }
+    </style>
 </head>
-<body class="bg-light">
+<body>
     <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <div class="card shadow">
-                    <div class="card-header bg-success text-white text-center">
-                        <h2>Calculation Results</h2>
-                    </div>
-                    <div class="card-body">
-                        <p class="fs-5">Your BMI: <strong>{{ bmi }}</strong></p>
-                        <p class="fs-5">BMI Status: <strong>{{ bmi_status }}</strong></p>
-                        <p class="fs-5">
-                            You need to burn approximately <strong>{{ calories_to_burn }}</strong> calories per week
-                            to reach your goal weight of <strong>{{ goal_weight }} kg</strong> in 
-                            <strong>{{ estimated_weeks }} weeks</strong>.
-                        </p>
-                        <div class="d-grid">
-                            <a href="{% url 'bmi_calculator' %}" class="btn btn-secondary">Back to Calculator</a>
-                        </div>
-                    </div>
-                </div>
+        <div class="result-container">
+            <div class="text-center">
+                <h2>BMI Calculation Results</h2>
             </div>
+
+            <!-- BMI Results Display -->
+            <div class="bmi-result">
+                <p class="bmi-value">Your BMI: <span class="text-success">{{ bmi}}</span></p>
+                <p class="bmi-status">BMI Status: <span class="text-success">{{ bmi_status }}</span></p>
+                <p class="bmi-message">{{ message }}</p>
+                <p class="calorie-message">To reach your goal weight of <strong>{{ goal_weight }}</strong> kg in <strong>{{ estimated_weeks }}</strong> weeks, you need to <strong>{{ action }}</strong> approximately <strong>{{ weekly_calories }}</strong> calories per week.</p>
+            </div>
+
+            <!-- Chart Container -->
+            <canvas id="bmiChart"></canvas>
         </div>
+
+        <!-- Footer -->
+        <footer>
+            <p>Want to learn more about BMI? <a href="https://my.clevelandclinic.org/health/articles/9464-body-mass-index-bmi">Read this article</a></p>
+        </footer>
     </div>
+
+    <script>
+        const ctx = document.getElementById('bmiChart').getContext('2d');
+        const bmi = {{ bmi }}; // Pass the BMI value from your Django context
+
+        const labels = ['Underweight', 'Normal Weight', 'Overweight', 'Obesity'];
+        const bmiRanges = [18.5, 24.9, 29.9, 40]; // Upper thresholds for each category
+
+        const chartData = {
+            labels: labels,
+            datasets: [{
+                label: 'BMI Ranges',
+                data: bmiRanges,
+                backgroundColor: ['#74c69d', '#ffd166', '#ff6b6b', '#d83333']
+            }]
+        };
+
+        const bmiChart = new Chart(ctx, {
+            type: 'bar',
+            data: chartData,
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 40,  // Maximum BMI shown in the chart
+                        title: {
+                            display: true,
+                            text: 'BMI Value'
+                        }
+                    }
+                },
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    annotation: {
+                        annotations: {
+                            bmiLine: {
+                                type: 'line',
+                                yMin: bmi, // Dynamic BMI value
+                                yMax: bmi,
+                                borderColor: 'blue',
+                                borderWidth: 2,
+                                label: {
+                                    content: 'Your BMI: ' + bmi.toFixed(1),
+                                    enabled: true,
+                                    position: 'top',
+                                    backgroundColor: 'white',
+                                    color: 'blue',
+                                    font: {
+                                        size: 14,
+                                        weight: 'bold'
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
 </body>
 </html>
