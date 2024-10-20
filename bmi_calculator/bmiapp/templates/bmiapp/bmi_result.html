@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,7 +12,7 @@
             background-color: #f4f6f9;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         .result-container {
             background-color: white;
             border-radius: 15px;
@@ -76,7 +75,6 @@
             text-decoration: underline;
         }
 
-        /* Chart styling */
         #bmiChart {
             margin-top: 30px;
             width: 100%;
@@ -93,10 +91,15 @@
 
             <!-- BMI Results Display -->
             <div class="bmi-result">
-                <p class="bmi-value">Your BMI: <span class="text-success">{{ bmi}}</span></p>
+                <p class="bmi-value">Your BMI: <span class="text-success">{{ bmi }}</span></p>
                 <p class="bmi-status">BMI Status: <span class="text-success">{{ bmi_status }}</span></p>
                 <p class="bmi-message">{{ message }}</p>
-                <p class="calorie-message">To reach your goal weight of <strong>{{ goal_weight }}</strong> kg in <strong>{{ estimated_weeks }}</strong> weeks, you need to <strong>{{ action }}</strong> approximately <strong>{{ weekly_calories }}</strong> calories per week.</p>
+                <p class="calorie-message">
+                    To reach your goal weight of <strong>{{ goal_weight }}</strong> kg in 
+                    <strong>{{ estimated_weeks }}</strong> weeks, you need to 
+                    <strong>{{ action }}</strong> approximately 
+                    <strong>{{ weekly_calories }}</strong> calories per week.
+                </p>
             </div>
 
             <!-- Chart Container -->
@@ -105,13 +108,17 @@
 
         <!-- Footer -->
         <footer>
-            <p>Want to learn more about BMI? <a href="https://my.clevelandclinic.org/health/articles/9464-body-mass-index-bmi">Read this article</a></p>
+            <p>Want to learn more about BMI? 
+                <a href="https://my.clevelandclinic.org/health/articles/9464-body-mass-index-bmi">Read this article</a>
+            </p>
         </footer>
     </div>
 
     <script>
+        // Safely parse the BMI value from the Django context, with a default of 0 if not provided.
+        const userBmi = parseFloat({{ bmi|default:"0" }});
+
         const ctx = document.getElementById('bmiChart').getContext('2d');
-        const bmi = {{ bmi }}; // Pass the BMI value from your Django context
 
         const labels = ['Underweight', 'Normal Weight', 'Overweight', 'Obesity'];
         const bmiRanges = [18.5, 24.9, 29.9, 40]; // Upper thresholds for each category
@@ -132,7 +139,7 @@
                 scales: {
                     y: {
                         beginAtZero: true,
-                        max: 40,  // Maximum BMI shown in the chart
+                        max: 40, // Maximum BMI shown on the chart
                         title: {
                             display: true,
                             text: 'BMI Value'
@@ -148,12 +155,12 @@
                         annotations: {
                             bmiLine: {
                                 type: 'line',
-                                yMin: bmi, // Dynamic BMI value
-                                yMax: bmi,
+                                yMin: userBmi,
+                                yMax: userBmi,
                                 borderColor: 'blue',
                                 borderWidth: 2,
                                 label: {
-                                    content: 'Your BMI: ' + bmi.toFixed(1),
+                                    content: 'Your BMI: ' + userBmi.toFixed(1),
                                     enabled: true,
                                     position: 'top',
                                     backgroundColor: 'white',
